@@ -2,8 +2,10 @@ package tn.esprit.autoloc.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.*;
+import java.util.HashSet;
+import java.util.Set;
 
-    @Entity
+@Entity
     @Table(name = "vehicule")
     @Getter
     @Setter
@@ -34,4 +36,16 @@ import java.math.*;
         @Enumerated(EnumType.STRING)
         @Column(nullable = false, length = 20)
         private StatutVehicule statut;
+
+        @ManyToOne
+        private Agence agence;
+
+        @OneToMany(mappedBy = "vehicule", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+        private Set<Reservation> reservations = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "vehicule_equipement",
+            joinColumns = @JoinColumn(name = "vehicule_id"),
+            inverseJoinColumns = @JoinColumn(name = "equipement_id"))
+    private Set<Equipement> equipements = new HashSet<>();
     }
