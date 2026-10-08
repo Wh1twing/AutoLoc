@@ -126,26 +126,30 @@ public class AgenceTests {
 
     @Test
     public void loadPagedAgences() {
-        // Q16 : tri décroissant + pages de 2 (page 0 = première page)
-        Page<Agence> page = fullAgenceRepository.findAll(
-                PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "idAgence")));
+        int taille = 2;
+        Sort tri = Sort.by(Sort.Direction.DESC, "idAgence");
 
-        // Q17 : total de pages, page en cours, agences de la page
+        Page<Agence> premiere = fullAgenceRepository.findAll(PageRequest.of(0, taille, tri));
+
         StringBuilder sb = new StringBuilder();
-        sb.append("Agences triées par id décroissant, paginées par 2\n");
-        sb.append("Nombre total de pages : ").append(page.getTotalPages()).append("\n");
-        sb.append("Page en cours : ").append(page.getNumber()).append("\n");
-        for (Agence agence : page.getContent()) {
-            sb.append(agence.getIdAgence())
-                    .append(" | ").append(agence.getNom())
-                    .append(" | ").append(agence.getVille())
-                    .append("\n");
-        }
+        sb.append("Agences triées par id décroissant, paginées par ").append(taille).append("\n");
+        sb.append("Nombre total de pages : ").append(premiere.getTotalPages()).append("\n\n");
 
-        // Q18
+        for (int i = 0; i < premiere.getTotalPages(); i++) {
+            Page<Agence> page = fullAgenceRepository.findAll(PageRequest.of(i, taille, tri));
+
+            sb.append("--- Page en cours : ").append(page.getNumber()).append(" ---\n");
+            for (Agence a : page.getContent()) {
+                sb.append("Agence ID : ").append(a.getIdAgence())
+                        .append(" | Nom : ").append(a.getNom())
+                        .append(" | Ville : ").append(a.getVille())
+                        .append("\n");
+            }
+            sb.append("\n");
+        }
         Assertions.fail(sb.toString());
     }
 }
 
-interface AgenceRepositoryMock extends CrudRepository<Agence, Long> {
-}
+    interface AgenceRepositoryMock extends CrudRepository<Agence, Long> {
+    }
