@@ -8,11 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 import tn.esprit.autoloc.domain.Agence;
 import tn.esprit.autoloc.domain.CategorieVehicule;
 import tn.esprit.autoloc.domain.StatutVehicule;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.repository.IAgenceRepository;
+import tn.esprit.autoloc.service.IAgenceService;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -23,9 +25,11 @@ import java.util.Set;
 public class AgenceTests {
 
     @Autowired
-    private AgenceRepositoryMock basicAgenceRepository;   // Q2
+    private AgenceRepositoryMock basicAgenceRepository;
     @Autowired
-    private IAgenceRepository fullAgenceRepository;       // Q3
+    private IAgenceRepository fullAgenceRepository;
+    @Autowired
+    private IAgenceService agenceService;
 
     // Q4 + Q6 : privée, sans @Test, avec le dépôt en paramètre
     private void addAgence(CrudRepository<Agence, Long> repository) {
@@ -149,7 +153,21 @@ public class AgenceTests {
         }
         Assertions.fail(sb.toString());
     }
+
+    @Test
+    void createAgence() {
+        Agence agence = new Agence();
+        agence.setNom("Agence Sfax");
+        agence.setVille("Sfax");
+        agence.setAdresse("5 Rue de la Liberté");
+        agence.setTelephone("74000000");
+
+        Agence creee = agenceService.create(agence);
+
+        Assertions.assertNotNull(creee.getIdAgence());
+    }
 }
 
+    @Repository
     interface AgenceRepositoryMock extends CrudRepository<Agence, Long> {
     }
