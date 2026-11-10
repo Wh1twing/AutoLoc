@@ -2,14 +2,22 @@ package tn.esprit.autoloc.service;
 
 import org.springframework.stereotype.Service;
 import tn.esprit.autoloc.Utils;
+import tn.esprit.autoloc.calcul.OffreStrategy;
+import tn.esprit.autoloc.calcul.VehiculeOffre;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.repository.IVehiculeRepository;
 
-@Service
-public class VehiculeServiceImpl extends GenericServiceImpl<Vehicule, Long> {
+import java.util.Map;
 
-    public VehiculeServiceImpl(IVehiculeRepository repository) {
+@Service
+public class VehiculeServiceImpl extends GenericServiceImpl<Vehicule, Long> implements IVehiculeService {
+
+    private final Map<String, OffreStrategy> strategies;
+
+    public VehiculeServiceImpl(IVehiculeRepository repository,
+                               Map<String, OffreStrategy> strategies) {
         super(repository);
+        this.strategies = strategies;
     }
 
     @Override
@@ -42,5 +50,15 @@ public class VehiculeServiceImpl extends GenericServiceImpl<Vehicule, Long> {
                 && Utils.isNotEmpty(entity.getMarque())
                 && Utils.isNotEmpty(entity.getModele())
                 && entity.getTarifJournalier() != null;
+    }
+
+    @Override
+    public double calculTarif(Vehicule vehicule, int nbJours, VehiculeOffre offre) {
+        double tarifJournalier = vehicule.getTarifJournalier().doubleValue();
+        OffreStrategy strategy = strategies.get(offre.name());
+        if (strategy == null) {
+            throw new IllegalArgumentException("Offre non supportée : " + offre);
+        }
+        return strategy.calculer(tarifJournalier, nbJours);
     }
 }
