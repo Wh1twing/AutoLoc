@@ -6,7 +6,7 @@ import tn.esprit.autoloc.domain.Employe;
 import tn.esprit.autoloc.repository.IEmployeRepository;
 
 @Service
-public class EmployeServiceImpl extends GenericServiceImpl<Employe, Long> {
+public class EmployeServiceImpl extends GenericServiceImpl<Employe, Long> implements IEmployeService {
 
     public EmployeServiceImpl(IEmployeRepository repository) {
         super(repository);

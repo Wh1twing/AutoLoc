@@ -95,4 +95,9 @@ public class AgenceController {
                           @RequestParam VehiculeOffre offre) {
         return agenceService.simuler(agenceService.findById(id), nbJours, offre);
     }
+
+    @PutMapping("/{id}/employes")
+    public Agence ajouterEmployes(@PathVariable Long id, @RequestBody Agence agence) {
+        return agenceService.ajouterEmployes(id, agence);
+    }
 }

@@ -8,4 +8,5 @@ import java.util.List;
 public interface IAgenceService extends IGenericService<Agence, Long>  {
     boolean hasVehicules(Long id);
     String simuler(Agence agence, int nbjours, VehiculeOffre offre);
+    Agence ajouterEmployes(Long id, Agence agence);
 }

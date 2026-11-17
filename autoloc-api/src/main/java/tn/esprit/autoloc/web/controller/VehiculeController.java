@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.service.IGenericService;
+import tn.esprit.autoloc.service.IVehiculeService;
 import tn.esprit.autoloc.web.ErrorResponse;
 
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Véhicules", description = "Gestion des vehicules")
 public class VehiculeController {
-    private final IGenericService<Vehicule, Long> vehiculeService;
+    private final IVehiculeService vehiculeService;
 
     @Operation(summary = "Lister les vehicules",
             description = "Retourne la liste complète des vehicules")
@@ -89,4 +90,20 @@ public class VehiculeController {
             @PathVariable Long id) {
         vehiculeService.deleteById(id);
     }
+
+    @PutMapping("desaffecter/{id}")
+    public Vehicule desaffecter(@PathVariable Long id) {
+        return vehiculeService.desaffecter(id);
+    }
+
+    @PutMapping("affecter/{id}/{idAgence}")
+    public Vehicule affecter(@PathVariable Long id,@PathVariable Long idAgence) {
+        return vehiculeService.affecter(id, idAgence);
+    }
+
+    @PutMapping("affecter_equipement/{id}/{idEquipement}")
+    public Vehicule affecterEquipement(@PathVariable Long id, @PathVariable Long idEquipement) {
+        return vehiculeService.affecterEquipement(id, idEquipement);
+    }
+
 }

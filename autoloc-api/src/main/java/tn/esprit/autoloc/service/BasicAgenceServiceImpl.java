@@ -71,5 +71,10 @@ public class BasicAgenceServiceImpl implements IAgenceService {
         throw new UnsupportedOperationException(
                 "La simulation n'est pas supportée par l'implémentation basique");
     }
+
+    @Override
+    public Agence ajouterEmployes(Long id, Agence agence) {
+        return null;
+    }
 }
 
