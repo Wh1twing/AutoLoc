@@ -1,6 +1,11 @@
 package tn.esprit.autoloc;
 
-public class Utils {
+public final class Utils {
+
+    private Utils() {
+        // classe utilitaire : pas d'instanciation
+    }
+
     public static boolean isNotEmpty(String str) {
         return str != null && !str.trim().isEmpty();
     }

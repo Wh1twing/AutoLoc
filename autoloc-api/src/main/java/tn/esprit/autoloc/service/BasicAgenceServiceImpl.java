@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class BasicAgenceServiceImpl implements IAgenceService {
-    final private IAgenceRepository repository;
+    private final IAgenceRepository repository;
 
     @Override
     public boolean check(Agence agence, boolean isNew) {

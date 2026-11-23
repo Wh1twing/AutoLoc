@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,11 +32,9 @@ public class MaintenanceController {
 
     @Operation(summary = "Consulter une maintenance",
             description = "Retourne la maintenance correspondant à l'identifiant")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Maintenance trouvée"),
-            @ApiResponse(responseCode = "404", description = "Maintenance inexistante",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @ApiResponse(responseCode = "200", description = "Maintenance trouvée")
+    @ApiResponse(responseCode = "404", description = "Maintenance inexistante",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{id}")
     public Maintenance findById(
             @Parameter(description = "Identifiant de la maintenance", example = "1")
@@ -47,11 +44,9 @@ public class MaintenanceController {
 
     @Operation(summary = "Ajouter une maintenance",
             description = "L'identifiant est généré automatiquement et ne doit pas être fourni")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Maintenance créée"),
-            @ApiResponse(responseCode = "400", description = "Données invalides ou identifiant fourni",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @ApiResponse(responseCode = "201", description = "Maintenance créée")
+    @ApiResponse(responseCode = "400", description = "Données invalides ou identifiant fourni",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Maintenance create(@RequestBody Maintenance maintenance) {
@@ -60,13 +55,11 @@ public class MaintenanceController {
 
     @Operation(summary = "Modifier une maintenance",
             description = "Met à jour la maintenance correspondant à l'identifiant")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Maintenance modifiée"),
-            @ApiResponse(responseCode = "400", description = "Données invalides",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Maintenance inexistante",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @ApiResponse(responseCode = "200", description = "Maintenance modifiée")
+    @ApiResponse(responseCode = "400", description = "Données invalides",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Maintenance inexistante",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")
     public Maintenance update(
             @Parameter(description = "Identifiant de la maintenance", example = "1")
@@ -77,11 +70,9 @@ public class MaintenanceController {
 
     @Operation(summary = "Supprimer une maintenance",
             description = "Supprime la maintenance correspondant à l'identifiant")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Maintenance supprimée"),
-            @ApiResponse(responseCode = "404", description = "Maintenance inexistante",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
+    @ApiResponse(responseCode = "204", description = "Maintenance supprimée")
+    @ApiResponse(responseCode = "404", description = "Maintenance inexistante",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(

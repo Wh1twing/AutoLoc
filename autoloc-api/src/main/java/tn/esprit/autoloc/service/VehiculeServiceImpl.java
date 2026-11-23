@@ -1,12 +1,10 @@
 package tn.esprit.autoloc.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import tn.esprit.autoloc.Utils;
 import tn.esprit.autoloc.calcul.OffreStrategy;
 import tn.esprit.autoloc.calcul.VehiculeOffre;
-import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.domain.Vehicule;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
 import tn.esprit.autoloc.repository.IAgenceRepository;
@@ -66,7 +64,7 @@ public class VehiculeServiceImpl extends GenericServiceImpl<Vehicule, Long> impl
     @Override
     public double calculTarif(Vehicule vehicule, int nbJours, VehiculeOffre offre) {
         double tarifJournalier = vehicule.getTarifJournalier().doubleValue();
-        OffreStrategy strategy = strategies.get(offre.name());
+        OffreStrategy strategy = strategies.get(offre.getNomStrategie());
         if (strategy == null) {
             throw new IllegalArgumentException("Offre non supportée : " + offre);
         }

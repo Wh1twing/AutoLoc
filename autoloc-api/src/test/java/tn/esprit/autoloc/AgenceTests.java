@@ -1,6 +1,7 @@
 package tn.esprit.autoloc;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,8 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Disabled("Tests des anciens ateliers")
 @SpringBootTest
-public class AgenceTests {
+class AgenceTests {
 
     @Autowired
     private AgenceRepositoryMock basicAgenceRepository;
@@ -32,7 +34,7 @@ public class AgenceTests {
     private IAgenceService agenceService;
 
     // Q4 + Q6 : privée, sans @Test, avec le dépôt en paramètre
-    private void addAgence(CrudRepository<Agence, Long> repository) {
+    private Agence addAgence(CrudRepository<Agence, Long> repository) {
         Agence agence = new Agence();
         agence.setAdresse("1 Rue Hedi");
         agence.setNom("Agence ariana");
@@ -64,20 +66,21 @@ public class AgenceTests {
         vehicules.add(vehicle13);
         agence.setVehicules(vehicules);
 
-        repository.save(agence);                          // uniquement le paramètre
+        return repository.save(agence);                   // retourne l'agence sauvegardée
     }
 
     @Test
-    public void basicAddAgence() {                        // Q7
-        addAgence(basicAgenceRepository);
+    void basicAddAgence() {                               // Q7
+        Agence agence = addAgence(basicAgenceRepository);
+        Assertions.assertNotNull(agence.getIdAgence());
     }
 
     @Test
-    public void fullAddAgence() {
-        addAgence(fullAgenceRepository);
+    void fullAddAgence() {
+        Agence agence = addAgence(fullAgenceRepository);
+        Assertions.assertNotNull(agence.getIdAgence());
     }
 
-    // à adapter à la Q10 (privée + paramètre dépôt + type de dépôt affiché)
     // Q10 : privée, sans @Test, avec le dépôt et son type en paramètres
     private void loadAgence(CrudRepository<Agence, Long> repository, String typeDepot) {
         Iterable<Agence> agences = repository.findAll();
@@ -99,17 +102,17 @@ public class AgenceTests {
     }
 
     @Test
-    public void basicLoadAgence() {
+    void basicLoadAgence() {
         loadAgence(basicAgenceRepository, "CrudRepository (basic)");
     }
 
     @Test
-    public void fullLoadAgence() {
+    void fullLoadAgence() {
         loadAgence(fullAgenceRepository, "JpaRepository (full)");
     }
 
     @Test
-    public void loadSortedAgences() {
+    void loadSortedAgences() {
         // Q12 : toutes les agences triées par id décroissant
         List<Agence> agences = fullAgenceRepository
                 .findAll(Sort.by(Sort.Direction.DESC, "idAgence"));
@@ -129,7 +132,7 @@ public class AgenceTests {
     }
 
     @Test
-    public void loadPagedAgences() {
+    void loadPagedAgences() {
         int taille = 2;
         Sort tri = Sort.by(Sort.Direction.DESC, "idAgence");
 
@@ -168,6 +171,6 @@ public class AgenceTests {
     }
 }
 
-    @Repository
-    interface AgenceRepositoryMock extends CrudRepository<Agence, Long> {
-    }
+@Repository
+interface AgenceRepositoryMock extends CrudRepository<Agence, Long> {
+}

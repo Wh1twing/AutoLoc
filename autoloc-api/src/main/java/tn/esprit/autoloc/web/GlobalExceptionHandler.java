@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final ZoneId FUSEAU = ZoneId.of("Africa/Tunis");
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(
@@ -20,7 +23,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
 
         ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
+                LocalDateTime.now(FUSEAU),
                 HttpStatus.NOT_FOUND.value(),
                 "Not Found",
                 ex.getMessage(),
@@ -36,7 +39,7 @@ public class GlobalExceptionHandler {
             HttpServletRequest request) {
 
         ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
+                LocalDateTime.now(FUSEAU),
                 HttpStatus.BAD_REQUEST.value(),
                 "Bad Request",
                 ex.getMessage(),
@@ -54,7 +57,7 @@ public class GlobalExceptionHandler {
         log.error("Erreur non gérée sur {}", request.getRequestURI(), ex);
 
         ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(),
+                LocalDateTime.now(FUSEAU),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Internal Server Error",
                 "Une erreur interne est survenue.",
