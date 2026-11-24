@@ -1,8 +1,8 @@
 package tn.esprit.autoloc.service;
 
-import jakarta.transaction.Transactional;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.Utils;
 import tn.esprit.autoloc.calcul.VehiculeOffre;
 import tn.esprit.autoloc.domain.Agence;
@@ -16,7 +16,10 @@ public class AgenceServiceImpl extends GenericServiceImpl<Agence, Long> implemen
 
     private final IVehiculeService vehiculeService;
     private final IEmployeService employeService;
-    public AgenceServiceImpl(IAgenceRepository agenceRepository, IVehiculeService vehiculeService, IEmployeService employeService) {
+
+    public AgenceServiceImpl(IAgenceRepository agenceRepository,
+                             IVehiculeService vehiculeService,
+                             IEmployeService employeService) {
         super(agenceRepository);
         this.vehiculeService = vehiculeService;
         this.employeService = employeService;
@@ -33,11 +36,11 @@ public class AgenceServiceImpl extends GenericServiceImpl<Agence, Long> implemen
     }
 
     @Override
-    protected void setFields(Agence source, Agence target) {
-        target.setNom(source.getNom());
-        target.setVille(source.getVille());
-        target.setAdresse(source.getAdresse());
-        target.setTelephone(source.getTelephone());
+    protected void setFields(Agence existing, Agence entity) {
+        existing.setNom(entity.getNom());
+        existing.setVille(entity.getVille());
+        existing.setAdresse(entity.getAdresse());
+        existing.setTelephone(entity.getTelephone());
     }
 
     @Override
@@ -50,16 +53,19 @@ public class AgenceServiceImpl extends GenericServiceImpl<Agence, Long> implemen
         return !findById(id).getVehicules().isEmpty();
     }
 
+    @Override
     public String simuler(Agence agence, int nbjours, VehiculeOffre offre) {
         StringBuilder rapport = new StringBuilder();
-        rapport.append("Id : "+ agence.getIdAgence() + "Nom : " + agence.getNom() + "Telephone : " + agence.getTelephone()+"\n");
+        rapport.append("Id : ").append(agence.getIdAgence()).append("\n")
+                .append("Nom : ").append(agence.getNom()).append("\n")
+                .append("Telephone : ").append(agence.getTelephone()).append("\n");
 
         double total = 0;
-        for(Vehicule vehicule : agence.getVehicules()){
+        for (Vehicule vehicule : agence.getVehicules()) {
             total += vehiculeService.calculTarif(vehicule, nbjours, offre);
         }
 
-        rapport.append("Total : " + total +"\n");
+        rapport.append("Total : ").append(total).append("\n");
         return rapport.toString();
     }
 

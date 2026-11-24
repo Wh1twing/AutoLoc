@@ -1,7 +1,7 @@
 package tn.esprit.autoloc.service;
 
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tn.esprit.autoloc.Utils;
 import tn.esprit.autoloc.calcul.OffreStrategy;
 import tn.esprit.autoloc.calcul.VehiculeOffre;
@@ -20,8 +20,9 @@ public class VehiculeServiceImpl extends GenericServiceImpl<Vehicule, Long> impl
     private final IAgenceRepository agenceRepository;
     private final IEquipementRepository equipementRepository;
 
-
-    public VehiculeServiceImpl(IVehiculeRepository repository, IAgenceRepository agenceRepository,IEquipementRepository equipementRepository,
+    public VehiculeServiceImpl(IVehiculeRepository repository,
+                               IAgenceRepository agenceRepository,
+                               IEquipementRepository equipementRepository,
                                Map<String, OffreStrategy> strategies) {
         super(repository);
         this.agenceRepository = agenceRepository;
@@ -82,7 +83,8 @@ public class VehiculeServiceImpl extends GenericServiceImpl<Vehicule, Long> impl
     @Override
     public Vehicule affecter(Long id, Long idAgence) {
         var vehicule = findById(id);
-        var agence = agenceRepository.findById(idAgence).orElseThrow(() -> new ResourceNotFoundException("agence",idAgence.toString()));
+        var agence = agenceRepository.findById(idAgence)
+                .orElseThrow(() -> new ResourceNotFoundException("agence", idAgence.toString()));
 
         vehicule.setAgence(agence);
         return repository.save(vehicule);
@@ -92,9 +94,10 @@ public class VehiculeServiceImpl extends GenericServiceImpl<Vehicule, Long> impl
     @Transactional
     public Vehicule affecterEquipement(Long idVehicule, Long idEquipement) {
         var vehicule = repository.findById(idVehicule)
-                .orElseThrow(() -> new ResourceNotFoundException("vehicule",idVehicule.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("vehicule", idVehicule.toString()));
         var equipement = equipementRepository.findById(idEquipement)
-                .orElseThrow(() -> new ResourceNotFoundException("equipement",idEquipement.toString()));
+                .orElseThrow(() -> new ResourceNotFoundException("equipement", idEquipement.toString()));
+
         vehicule.getEquipements().add(equipement);
         return repository.save(vehicule);
     }
