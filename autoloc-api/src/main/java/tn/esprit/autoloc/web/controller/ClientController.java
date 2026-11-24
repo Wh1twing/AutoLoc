@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Client;
 import tn.esprit.autoloc.service.IGenericService;
 import tn.esprit.autoloc.web.ErrorResponse;
+import tn.esprit.autoloc.web.dto.ClientDTO;
+import tn.esprit.autoloc.web.dto.ClientMapper;
 
 import java.util.List;
 
@@ -21,13 +23,14 @@ import java.util.List;
 @Tag(name = "Clients", description = "Gestion des clients")
 public class ClientController {
     private final IGenericService<Client, Long> clientService;
+    private final ClientMapper clientMapper;
 
     @Operation(summary = "Lister les clients",
             description = "Retourne la liste complète des clients")
     @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     @GetMapping
-    public List<Client> findAll() {
-        return clientService.findAll();
+    public List<ClientDTO> findAll() {
+        return clientMapper.toDTOList(clientService.findAll());
     }
 
     @Operation(summary = "Consulter un client",
@@ -36,10 +39,10 @@ public class ClientController {
     @ApiResponse(responseCode = "404", description = "Client inexistant",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{id}")
-    public Client findById(
+    public ClientDTO findById(
             @Parameter(description = "Identifiant du client", example = "1")
             @PathVariable Long id) {
-        return clientService.findById(id);
+        return clientMapper.toDTO(clientService.findById(id));
     }
 
     @Operation(summary = "Ajouter un client",
@@ -49,8 +52,9 @@ public class ClientController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Client create(@RequestBody Client client) {
-        return clientService.create(client);
+    public ClientDTO create(@RequestBody ClientDTO clientDTO) {
+        Client client = clientMapper.fromDTO(clientDTO);
+        return clientMapper.toDTO(clientService.create(client));
     }
 
     @Operation(summary = "Modifier un client",
@@ -61,11 +65,12 @@ public class ClientController {
     @ApiResponse(responseCode = "404", description = "Client inexistant",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")
-    public Client update(
+    public ClientDTO update(
             @Parameter(description = "Identifiant du client", example = "1")
             @PathVariable Long id,
-            @RequestBody Client client) {
-        return clientService.update(id, client);
+            @RequestBody ClientDTO clientDTO) {
+        Client client = clientMapper.fromDTO(clientDTO);
+        return clientMapper.toDTO(clientService.update(id, client));
     }
 
     @Operation(summary = "Supprimer un client",

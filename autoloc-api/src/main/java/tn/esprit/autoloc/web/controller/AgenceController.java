@@ -13,6 +13,8 @@ import tn.esprit.autoloc.calcul.VehiculeOffre;
 import tn.esprit.autoloc.domain.Agence;
 import tn.esprit.autoloc.service.IAgenceService;
 import tn.esprit.autoloc.web.ErrorResponse;
+import tn.esprit.autoloc.web.dto.AgenceDTO;
+import tn.esprit.autoloc.web.dto.AgenceMapper;
 
 import java.util.List;
 
@@ -22,13 +24,14 @@ import java.util.List;
 @Tag(name = "Agences", description = "Gestion des agences de location")
 public class AgenceController {
     private final IAgenceService agenceService;
+    private final AgenceMapper agenceMapper;
 
     @Operation(summary = "Lister les agences",
             description = "Retourne la liste complète des agences")
     @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     @GetMapping
-    public List<Agence> findAll() {
-        return agenceService.findAll();
+    public List<AgenceDTO> findAll() {
+        return agenceMapper.toDTOList(agenceService.findAll());
     }
 
     @Operation(summary = "Consulter une agence",
@@ -37,10 +40,10 @@ public class AgenceController {
     @ApiResponse(responseCode = "404", description = "Agence inexistante",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{id}")                                  // Q19
-    public Agence findById(
+    public AgenceDTO findById(
             @Parameter(description = "Identifiant de l'agence", example = "1")
             @PathVariable Long id) {
-        return agenceService.findById(id);
+        return agenceMapper.toDTO(agenceService.findById(id));
     }
 
     @Operation(summary = "Ajouter une agence",
@@ -50,8 +53,10 @@ public class AgenceController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping                                          // Q21
     @ResponseStatus(HttpStatus.CREATED)
-    public Agence create(@RequestBody Agence agence) {
-        return agenceService.create(agence);
+    public AgenceDTO create(@RequestBody AgenceDTO agenceDTO) {
+        Agence agence = agenceMapper.fromDTO(agenceDTO);
+        Agence creee = agenceService.create(agence);
+        return agenceMapper.toDTO(creee);
     }
 
     @Operation(summary = "Modifier une agence",
@@ -60,11 +65,13 @@ public class AgenceController {
     @ApiResponse(responseCode = "404", description = "Agence inexistante",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")                                  // Q24
-    public Agence update(
+    public AgenceDTO update(
             @Parameter(description = "Identifiant de l'agence", example = "1")
             @PathVariable Long id,
-            @RequestBody Agence agence) {
-        return agenceService.update(id, agence);
+            @RequestBody AgenceDTO agenceDTO) {
+        Agence agence = agenceMapper.fromDTO(agenceDTO);
+        Agence modifiee = agenceService.update(id, agence);
+        return agenceMapper.toDTO(modifiee);
     }
 
     @Operation(summary = "Supprimer une agence",
@@ -88,7 +95,9 @@ public class AgenceController {
     }
 
     @PutMapping("/{id}/employes")
-    public Agence ajouterEmployes(@PathVariable Long id, @RequestBody Agence agence) {
-        return agenceService.ajouterEmployes(id, agence);
+    public AgenceDTO ajouterEmployes(@PathVariable Long id, @RequestBody AgenceDTO agenceDTO) {
+        Agence agence = agenceMapper.fromDTO(agenceDTO);
+        Agence miseAJour = agenceService.ajouterEmployes(id, agence);
+        return agenceMapper.toDTO(miseAJour);
     }
 }

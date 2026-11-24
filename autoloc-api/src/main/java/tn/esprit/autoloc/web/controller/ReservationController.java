@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Reservation;
 import tn.esprit.autoloc.service.IGenericService;
 import tn.esprit.autoloc.web.ErrorResponse;
+import tn.esprit.autoloc.web.dto.ReservationDTO;
+import tn.esprit.autoloc.web.dto.ReservationMapper;
 
 import java.util.List;
 
@@ -21,13 +23,14 @@ import java.util.List;
 @Tag(name = "Réservations", description = "Gestion des reservations")
 public class ReservationController {
     private final IGenericService<Reservation, Long> reservationService;
+    private final ReservationMapper reservationMapper;
 
     @Operation(summary = "Lister les reservations",
             description = "Retourne la liste complète des reservations")
     @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     @GetMapping
-    public List<Reservation> findAll() {
-        return reservationService.findAll();
+    public List<ReservationDTO> findAll() {
+        return reservationMapper.toDTOList(reservationService.findAll());
     }
 
     @Operation(summary = "Consulter une réservation",
@@ -36,10 +39,10 @@ public class ReservationController {
     @ApiResponse(responseCode = "404", description = "Réservation inexistante",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{id}")
-    public Reservation findById(
+    public ReservationDTO findById(
             @Parameter(description = "Identifiant de la réservation", example = "1")
             @PathVariable Long id) {
-        return reservationService.findById(id);
+        return reservationMapper.toDTO(reservationService.findById(id));
     }
 
     @Operation(summary = "Ajouter une réservation",
@@ -49,8 +52,9 @@ public class ReservationController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Reservation create(@RequestBody Reservation reservation) {
-        return reservationService.create(reservation);
+    public ReservationDTO create(@RequestBody ReservationDTO reservationDTO) {
+        Reservation reservation = reservationMapper.fromDTO(reservationDTO);
+        return reservationMapper.toDTO(reservationService.create(reservation));
     }
 
     @Operation(summary = "Modifier une réservation",
@@ -61,11 +65,12 @@ public class ReservationController {
     @ApiResponse(responseCode = "404", description = "Réservation inexistante",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")
-    public Reservation update(
+    public ReservationDTO update(
             @Parameter(description = "Identifiant de la réservation", example = "1")
             @PathVariable Long id,
-            @RequestBody Reservation reservation) {
-        return reservationService.update(id, reservation);
+            @RequestBody ReservationDTO reservationDTO) {
+        Reservation reservation = reservationMapper.fromDTO(reservationDTO);
+        return reservationMapper.toDTO(reservationService.update(id, reservation));
     }
 
     @Operation(summary = "Supprimer une réservation",

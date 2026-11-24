@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Maintenance;
 import tn.esprit.autoloc.service.IGenericService;
 import tn.esprit.autoloc.web.ErrorResponse;
+import tn.esprit.autoloc.web.dto.MaintenanceDTO;
+import tn.esprit.autoloc.web.dto.MaintenanceMapper;
 
 import java.util.List;
 
@@ -21,13 +23,14 @@ import java.util.List;
 @Tag(name = "Maintenances", description = "Gestion des maintenances")
 public class MaintenanceController {
     private final IGenericService<Maintenance, Long> maintenanceService;
+    private final MaintenanceMapper maintenanceMapper;
 
     @Operation(summary = "Lister les maintenances",
             description = "Retourne la liste complète des maintenances")
     @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     @GetMapping
-    public List<Maintenance> findAll() {
-        return maintenanceService.findAll();
+    public List<MaintenanceDTO> findAll() {
+        return maintenanceMapper.toDTOList(maintenanceService.findAll());
     }
 
     @Operation(summary = "Consulter une maintenance",
@@ -36,10 +39,10 @@ public class MaintenanceController {
     @ApiResponse(responseCode = "404", description = "Maintenance inexistante",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{id}")
-    public Maintenance findById(
+    public MaintenanceDTO findById(
             @Parameter(description = "Identifiant de la maintenance", example = "1")
             @PathVariable Long id) {
-        return maintenanceService.findById(id);
+        return maintenanceMapper.toDTO(maintenanceService.findById(id));
     }
 
     @Operation(summary = "Ajouter une maintenance",
@@ -49,8 +52,9 @@ public class MaintenanceController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Maintenance create(@RequestBody Maintenance maintenance) {
-        return maintenanceService.create(maintenance);
+    public MaintenanceDTO create(@RequestBody MaintenanceDTO maintenanceDTO) {
+        Maintenance maintenance = maintenanceMapper.fromDTO(maintenanceDTO);
+        return maintenanceMapper.toDTO(maintenanceService.create(maintenance));
     }
 
     @Operation(summary = "Modifier une maintenance",
@@ -61,11 +65,12 @@ public class MaintenanceController {
     @ApiResponse(responseCode = "404", description = "Maintenance inexistante",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")
-    public Maintenance update(
+    public MaintenanceDTO update(
             @Parameter(description = "Identifiant de la maintenance", example = "1")
             @PathVariable Long id,
-            @RequestBody Maintenance maintenance) {
-        return maintenanceService.update(id, maintenance);
+            @RequestBody MaintenanceDTO maintenanceDTO) {
+        Maintenance maintenance = maintenanceMapper.fromDTO(maintenanceDTO);
+        return maintenanceMapper.toDTO(maintenanceService.update(id, maintenance));
     }
 
     @Operation(summary = "Supprimer une maintenance",

@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Employe;
 import tn.esprit.autoloc.service.IGenericService;
 import tn.esprit.autoloc.web.ErrorResponse;
+import tn.esprit.autoloc.web.dto.EmployeDTO;
+import tn.esprit.autoloc.web.dto.EmployeMapper;
 
 import java.util.List;
 
@@ -21,13 +23,14 @@ import java.util.List;
 @Tag(name = "Employés", description = "Gestion des employes")
 public class EmployeController {
     private final IGenericService<Employe, Long> employeService;
+    private final EmployeMapper employeMapper;
 
     @Operation(summary = "Lister les employes",
             description = "Retourne la liste complète des employes")
     @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     @GetMapping
-    public List<Employe> findAll() {
-        return employeService.findAll();
+    public List<EmployeDTO> findAll() {
+        return employeMapper.toDTOList(employeService.findAll());
     }
 
     @Operation(summary = "Consulter un employé",
@@ -36,10 +39,10 @@ public class EmployeController {
     @ApiResponse(responseCode = "404", description = "Employé inexistant",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{id}")
-    public Employe findById(
+    public EmployeDTO findById(
             @Parameter(description = "Identifiant du employé", example = "1")
             @PathVariable Long id) {
-        return employeService.findById(id);
+        return employeMapper.toDTO(employeService.findById(id));
     }
 
     @Operation(summary = "Ajouter un employé",
@@ -49,8 +52,9 @@ public class EmployeController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Employe create(@RequestBody Employe employe) {
-        return employeService.create(employe);
+    public EmployeDTO create(@RequestBody EmployeDTO employeDTO) {
+        Employe employe = employeMapper.fromDTO(employeDTO);
+        return employeMapper.toDTO(employeService.create(employe));
     }
 
     @Operation(summary = "Modifier un employé",
@@ -61,11 +65,12 @@ public class EmployeController {
     @ApiResponse(responseCode = "404", description = "Employé inexistant",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")
-    public Employe update(
+    public EmployeDTO update(
             @Parameter(description = "Identifiant du employé", example = "1")
             @PathVariable Long id,
-            @RequestBody Employe employe) {
-        return employeService.update(id, employe);
+            @RequestBody EmployeDTO employeDTO) {
+        Employe employe = employeMapper.fromDTO(employeDTO);
+        return employeMapper.toDTO(employeService.update(id, employe));
     }
 
     @Operation(summary = "Supprimer un employé",

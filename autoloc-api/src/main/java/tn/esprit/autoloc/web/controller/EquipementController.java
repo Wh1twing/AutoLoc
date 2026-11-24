@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Equipement;
 import tn.esprit.autoloc.service.IGenericService;
 import tn.esprit.autoloc.web.ErrorResponse;
+import tn.esprit.autoloc.web.dto.EquipementDTO;
+import tn.esprit.autoloc.web.dto.EquipementMapper;
 
 import java.util.List;
 
@@ -21,13 +23,14 @@ import java.util.List;
 @Tag(name = "Équipements", description = "Gestion des equipements")
 public class EquipementController {
     private final IGenericService<Equipement, Long> equipementService;
+    private final EquipementMapper equipementMapper;
 
     @Operation(summary = "Lister les equipements",
             description = "Retourne la liste complète des equipements")
     @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     @GetMapping
-    public List<Equipement> findAll() {
-        return equipementService.findAll();
+    public List<EquipementDTO> findAll() {
+        return equipementMapper.toDTOList(equipementService.findAll());
     }
 
     @Operation(summary = "Consulter un équipement",
@@ -36,10 +39,10 @@ public class EquipementController {
     @ApiResponse(responseCode = "404", description = "Équipement inexistant",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{id}")
-    public Equipement findById(
+    public EquipementDTO findById(
             @Parameter(description = "Identifiant du équipement", example = "1")
             @PathVariable Long id) {
-        return equipementService.findById(id);
+        return equipementMapper.toDTO(equipementService.findById(id));
     }
 
     @Operation(summary = "Ajouter un équipement",
@@ -49,8 +52,9 @@ public class EquipementController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Equipement create(@RequestBody Equipement equipement) {
-        return equipementService.create(equipement);
+    public EquipementDTO create(@RequestBody EquipementDTO equipementDTO) {
+        Equipement equipement = equipementMapper.fromDTO(equipementDTO);
+        return equipementMapper.toDTO(equipementService.create(equipement));
     }
 
     @Operation(summary = "Modifier un équipement",
@@ -61,11 +65,12 @@ public class EquipementController {
     @ApiResponse(responseCode = "404", description = "Équipement inexistant",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")
-    public Equipement update(
+    public EquipementDTO update(
             @Parameter(description = "Identifiant du équipement", example = "1")
             @PathVariable Long id,
-            @RequestBody Equipement equipement) {
-        return equipementService.update(id, equipement);
+            @RequestBody EquipementDTO equipementDTO) {
+        Equipement equipement = equipementMapper.fromDTO(equipementDTO);
+        return equipementMapper.toDTO(equipementService.update(id, equipement));
     }
 
     @Operation(summary = "Supprimer un équipement",

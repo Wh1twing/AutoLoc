@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import tn.esprit.autoloc.domain.Contrat;
 import tn.esprit.autoloc.service.IGenericService;
 import tn.esprit.autoloc.web.ErrorResponse;
+import tn.esprit.autoloc.web.dto.ContratDTO;
+import tn.esprit.autoloc.web.dto.ContratMapper;
 
 import java.util.List;
 
@@ -21,13 +23,14 @@ import java.util.List;
 @Tag(name = "Contrats", description = "Gestion des contrats")
 public class ContratController {
     private final IGenericService<Contrat, Long> contratService;
+    private final ContratMapper contratMapper;
 
     @Operation(summary = "Lister les contrats",
             description = "Retourne la liste complète des contrats")
     @ApiResponse(responseCode = "200", description = "Liste retournée avec succès")
     @GetMapping
-    public List<Contrat> findAll() {
-        return contratService.findAll();
+    public List<ContratDTO> findAll() {
+        return contratMapper.toDTOList(contratService.findAll());
     }
 
     @Operation(summary = "Consulter un contrat",
@@ -36,10 +39,10 @@ public class ContratController {
     @ApiResponse(responseCode = "404", description = "Contrat inexistant",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @GetMapping("/{id}")
-    public Contrat findById(
+    public ContratDTO findById(
             @Parameter(description = "Identifiant du contrat", example = "1")
             @PathVariable Long id) {
-        return contratService.findById(id);
+        return contratMapper.toDTO(contratService.findById(id));
     }
 
     @Operation(summary = "Ajouter un contrat",
@@ -49,8 +52,9 @@ public class ContratController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Contrat create(@RequestBody Contrat contrat) {
-        return contratService.create(contrat);
+    public ContratDTO create(@RequestBody ContratDTO contratDTO) {
+        Contrat contrat = contratMapper.fromDTO(contratDTO);
+        return contratMapper.toDTO(contratService.create(contrat));
     }
 
     @Operation(summary = "Modifier un contrat",
@@ -61,11 +65,12 @@ public class ContratController {
     @ApiResponse(responseCode = "404", description = "Contrat inexistant",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")
-    public Contrat update(
+    public ContratDTO update(
             @Parameter(description = "Identifiant du contrat", example = "1")
             @PathVariable Long id,
-            @RequestBody Contrat contrat) {
-        return contratService.update(id, contrat);
+            @RequestBody ContratDTO contratDTO) {
+        Contrat contrat = contratMapper.fromDTO(contratDTO);
+        return contratMapper.toDTO(contratService.update(id, contrat));
     }
 
     @Operation(summary = "Supprimer un contrat",
