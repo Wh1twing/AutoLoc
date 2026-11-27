@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class ContratController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ContratDTO create(@RequestBody ContratDTO contratDTO) {
+    public ContratDTO create(@Valid @RequestBody ContratDTO contratDTO) {
         Contrat contrat = contratMapper.fromDTO(contratDTO);
         return contratMapper.toDTO(contratService.create(contrat));
     }
@@ -68,7 +69,7 @@ public class ContratController {
     public ContratDTO update(
             @Parameter(description = "Identifiant du contrat", example = "1")
             @PathVariable Long id,
-            @RequestBody ContratDTO contratDTO) {
+            @Valid @RequestBody ContratDTO contratDTO) {
         Contrat contrat = contratMapper.fromDTO(contratDTO);
         return contratMapper.toDTO(contratService.update(id, contrat));
     }

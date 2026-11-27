@@ -8,10 +8,10 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface VehiculeMapper {
-    @Mapping(source = "agence.idAgence", target = "idAgence")
     VehiculeDTO toDTO(Vehicule vehicule);
 
-    @Mapping(source = "idAgence", target = "agence.idAgence")
+    @Mapping(target = "idVehicule", ignore = true)
+    @Mapping(target = "agence", ignore = true)
     @Mapping(target = "reservations", ignore = true)
     @Mapping(target = "equipements", ignore = true)
     Vehicule fromDTO(VehiculeDTO vehiculeDTO);

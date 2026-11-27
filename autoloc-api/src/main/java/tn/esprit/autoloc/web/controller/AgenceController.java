@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +54,7 @@ public class AgenceController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping                                          // Q21
     @ResponseStatus(HttpStatus.CREATED)
-    public AgenceDTO create(@RequestBody AgenceDTO agenceDTO) {
+    public AgenceDTO create(@Valid @RequestBody AgenceDTO agenceDTO) {
         Agence agence = agenceMapper.fromDTO(agenceDTO);
         Agence creee = agenceService.create(agence);
         return agenceMapper.toDTO(creee);
@@ -62,13 +63,15 @@ public class AgenceController {
     @Operation(summary = "Modifier une agence",
             description = "Met à jour l'agence correspondant à l'identifiant")
     @ApiResponse(responseCode = "200", description = "Agence modifiée")
+    @ApiResponse(responseCode = "400", description = "Données invalides",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "404", description = "Agence inexistante",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PutMapping("/{id}")                                  // Q24
     public AgenceDTO update(
             @Parameter(description = "Identifiant de l'agence", example = "1")
             @PathVariable Long id,
-            @RequestBody AgenceDTO agenceDTO) {
+            @Valid @RequestBody AgenceDTO agenceDTO) {
         Agence agence = agenceMapper.fromDTO(agenceDTO);
         Agence modifiee = agenceService.update(id, agence);
         return agenceMapper.toDTO(modifiee);
@@ -95,7 +98,7 @@ public class AgenceController {
     }
 
     @PutMapping("/{id}/employes")
-    public AgenceDTO ajouterEmployes(@PathVariable Long id, @RequestBody AgenceDTO agenceDTO) {
+    public AgenceDTO ajouterEmployes(@PathVariable Long id, @Valid @RequestBody AgenceDTO agenceDTO) {
         Agence agence = agenceMapper.fromDTO(agenceDTO);
         Agence miseAJour = agenceService.ajouterEmployes(id, agence);
         return agenceMapper.toDTO(miseAJour);

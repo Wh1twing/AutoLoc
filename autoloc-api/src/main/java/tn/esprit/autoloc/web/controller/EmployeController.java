@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class EmployeController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EmployeDTO create(@RequestBody EmployeDTO employeDTO) {
+    public EmployeDTO create(@Valid @RequestBody EmployeDTO employeDTO) {
         Employe employe = employeMapper.fromDTO(employeDTO);
         return employeMapper.toDTO(employeService.create(employe));
     }
@@ -68,7 +69,7 @@ public class EmployeController {
     public EmployeDTO update(
             @Parameter(description = "Identifiant du employé", example = "1")
             @PathVariable Long id,
-            @RequestBody EmployeDTO employeDTO) {
+            @Valid @RequestBody EmployeDTO employeDTO) {
         Employe employe = employeMapper.fromDTO(employeDTO);
         return employeMapper.toDTO(employeService.update(id, employe));
     }

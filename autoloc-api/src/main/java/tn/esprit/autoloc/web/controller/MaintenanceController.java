@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class MaintenanceController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MaintenanceDTO create(@RequestBody MaintenanceDTO maintenanceDTO) {
+    public MaintenanceDTO create(@Valid @RequestBody MaintenanceDTO maintenanceDTO) {
         Maintenance maintenance = maintenanceMapper.fromDTO(maintenanceDTO);
         return maintenanceMapper.toDTO(maintenanceService.create(maintenance));
     }
@@ -68,7 +69,7 @@ public class MaintenanceController {
     public MaintenanceDTO update(
             @Parameter(description = "Identifiant de la maintenance", example = "1")
             @PathVariable Long id,
-            @RequestBody MaintenanceDTO maintenanceDTO) {
+            @Valid @RequestBody MaintenanceDTO maintenanceDTO) {
         Maintenance maintenance = maintenanceMapper.fromDTO(maintenanceDTO);
         return maintenanceMapper.toDTO(maintenanceService.update(id, maintenance));
     }

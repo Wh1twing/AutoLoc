@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class ClientController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ClientDTO create(@RequestBody ClientDTO clientDTO) {
+    public ClientDTO create(@Valid @RequestBody ClientDTO clientDTO) {
         Client client = clientMapper.fromDTO(clientDTO);
         return clientMapper.toDTO(clientService.create(client));
     }
@@ -68,7 +69,7 @@ public class ClientController {
     public ClientDTO update(
             @Parameter(description = "Identifiant du client", example = "1")
             @PathVariable Long id,
-            @RequestBody ClientDTO clientDTO) {
+            @Valid @RequestBody ClientDTO clientDTO) {
         Client client = clientMapper.fromDTO(clientDTO);
         return clientMapper.toDTO(clientService.update(id, client));
     }

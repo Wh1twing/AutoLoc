@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class EquipementController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EquipementDTO create(@RequestBody EquipementDTO equipementDTO) {
+    public EquipementDTO create(@Valid @RequestBody EquipementDTO equipementDTO) {
         Equipement equipement = equipementMapper.fromDTO(equipementDTO);
         return equipementMapper.toDTO(equipementService.create(equipement));
     }
@@ -68,7 +69,7 @@ public class EquipementController {
     public EquipementDTO update(
             @Parameter(description = "Identifiant du équipement", example = "1")
             @PathVariable Long id,
-            @RequestBody EquipementDTO equipementDTO) {
+            @Valid @RequestBody EquipementDTO equipementDTO) {
         Equipement equipement = equipementMapper.fromDTO(equipementDTO);
         return equipementMapper.toDTO(equipementService.update(id, equipement));
     }

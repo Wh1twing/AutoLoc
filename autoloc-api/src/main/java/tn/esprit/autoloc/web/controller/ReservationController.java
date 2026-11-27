@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class ReservationController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ReservationDTO create(@RequestBody ReservationDTO reservationDTO) {
+    public ReservationDTO create(@Valid @RequestBody ReservationDTO reservationDTO) {
         Reservation reservation = reservationMapper.fromDTO(reservationDTO);
         return reservationMapper.toDTO(reservationService.create(reservation));
     }
@@ -68,7 +69,7 @@ public class ReservationController {
     public ReservationDTO update(
             @Parameter(description = "Identifiant de la réservation", example = "1")
             @PathVariable Long id,
-            @RequestBody ReservationDTO reservationDTO) {
+            @Valid @RequestBody ReservationDTO reservationDTO) {
         Reservation reservation = reservationMapper.fromDTO(reservationDTO);
         return reservationMapper.toDTO(reservationService.update(id, reservation));
     }

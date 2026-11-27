@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ public class VehiculeController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public VehiculeDTO create(@RequestBody VehiculeDTO vehiculeDTO) {
+    public VehiculeDTO create(@Valid @RequestBody VehiculeDTO vehiculeDTO) {
         Vehicule vehicule = vehiculeMapper.fromDTO(vehiculeDTO);
         return vehiculeMapper.toDTO(vehiculeService.create(vehicule));
     }
@@ -68,7 +69,7 @@ public class VehiculeController {
     public VehiculeDTO update(
             @Parameter(description = "Identifiant du véhicule", example = "1")
             @PathVariable Long id,
-            @RequestBody VehiculeDTO vehiculeDTO) {
+            @Valid @RequestBody VehiculeDTO vehiculeDTO) {
         Vehicule vehicule = vehiculeMapper.fromDTO(vehiculeDTO);
         return vehiculeMapper.toDTO(vehiculeService.update(id, vehicule));
     }

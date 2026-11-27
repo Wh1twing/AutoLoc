@@ -1,52 +1,48 @@
 package tn.esprit.autoloc.web;
 
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import tn.esprit.autoloc.exception.ResourceNotFoundException;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.HashMap;
+import java.util.Map;
 
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final ZoneId FUSEAU = ZoneId.of("Africa/Tunis");
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final ZoneId ZONE = ZoneId.of("Africa/Tunis");
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(
             ResourceNotFoundException ex,
             HttpServletRequest request) {
-
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(FUSEAU),
-                HttpStatus.NOT_FOUND.value(),
-                "Not Found",
-                ex.getMessage(),
-                request.getRequestURI()
-        );
-
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+        return build(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+    public ResponseEntity<ErrorResponse> handleBadRequest(
             IllegalArgumentException ex,
             HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
 
-        ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(FUSEAU),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request",
-                ex.getMessage(),
-                request.getRequestURI()
-        );
 
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
+    public ResponseEntity<ErrorResponse> handleBadParameter(Exception ex, HttpServletRequest request) {
+        return build(HttpStatus.BAD_REQUEST,
+                "Parametre invalide ou manquant (jours: entier, offre: STANDARD, WEEKEND ou LONGUE_DUREE).",
+                request);
     }
 
     @ExceptionHandler(Exception.class)
@@ -54,16 +50,26 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request) {
 
-        log.error("Erreur non gérée sur {}", request.getRequestURI(), ex);
+        log.error("Erreur inattendue sur {}", request.getRequestURI(), ex);
 
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Une erreur interne est survenue.", request);
+    }
+
+    private ResponseEntity<ErrorResponse> build(HttpStatus status, String message, HttpServletRequest request) {
         ErrorResponse error = new ErrorResponse(
-                LocalDateTime.now(FUSEAU),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                "Une erreur interne est survenue.",
+                LocalDateTime.now(ZONE),
+                status.value(),
+                status.getReasonPhrase(),   // "Not Found", "Bad Request", "Conflict", "Internal Server Error"
+                message,
                 request.getRequestURI()
         );
-
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, status);
     }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidation(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> erreurs = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(err ->
+                erreurs.put(err.getField(), err.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(erreurs);}
 }
